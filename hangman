@@ -1,0 +1,156 @@
+from tkinter import *
+
+# declare the variables
+tk=Tk()
+v=StringVar()
+v.set("Start")
+words=("b_ _k_p","_lg_ri_hm","kil_b_t_")
+result=(("a","c","u"),("a","o","t"),("o","y","e"))
+current_word=0       
+current_char=0
+count=0
+you_win=False
+
+# set the screen
+canvas=Canvas(tk, width=500, height=600,background="white")
+canvas.pack()
+# set the frame for keypress
+frame=Frame(tk,width=2,height=2,background="white")
+
+# introduction
+canvas.create_text(250,100,text="Welcome",fill="black",font=("Courier",30))
+canvas.create_text(250,150,text="to",fill="black",font=("Courier",30))
+canvas.create_text(252,200,text="Hangman!",fill="black",font=("Courier",30))
+canvas.create_text(250,400,text="Rule:",fill="black",font=("Courier",20))
+canvas.create_text(250,450,text="Type the letter in order",fill="black",font=("Courier",20))
+canvas.create_text(250,500,text="from left to right.",fill="black",font=("Courier",20))
+
+# hangman drawing
+def drawing(step):
+    if step==1:
+        canvas.create_line(130,130,320,130)
+    if step==2:
+        canvas.create_line(130,130,320,130)
+        canvas.create_line(135,125,135,350)
+    if step==3:
+        canvas.create_line(130,130,320,130)
+        canvas.create_line(135,125,135,350)
+        canvas.create_line(270,130,270,170)
+    if step==4:
+        canvas.create_line(130,130,320,130)
+        canvas.create_line(135,125,135,350)
+        canvas.create_line(270,130,270,170)
+        canvas.create_oval(250,170,290,210)
+    if step==5:
+        canvas.create_line(130,130,320,130)
+        canvas.create_line(135,125,135,350)
+        canvas.create_line(270,130,270,170)
+        canvas.create_oval(250,170,290,210)
+        canvas.create_line(270,210,270,280)
+    if step==6:
+        canvas.create_line(130,130,320,130)
+        canvas.create_line(135,125,135,350)
+        canvas.create_line(270,130,270,170)
+        canvas.create_oval(250,170,290,210)
+        canvas.create_line(270,210,270,280)
+        canvas.create_line(270,250,245,225)
+        canvas.create_line(270,250,295,225)
+    if step==7:
+        canvas.create_line(130,130,320,130)
+        canvas.create_line(135,125,135,350)
+        canvas.create_line(270,130,270,170)
+        canvas.create_oval(250,170,290,210)
+        canvas.create_line(270,210,270,280)
+        canvas.create_line(270,250,245,225)
+        canvas.create_line(270,250,295,225)
+        canvas.create_line(270,280,245,305)
+        canvas.create_line(270,280,295,305)
+
+def show_word():
+    global you_win,current_char,current_word
+    canvas.create_rectangle(0,0,500,600,outline="white",fill="white")
+    canvas.create_text(250,50,text=words[current_word],fill="black",font=("Courier",25))
+    you_win=False
+    current_char=0
+    
+def btn_click():
+    btn.pack_forget()
+    show_word()
+    frame.bind("<KeyPress>",user_Input)
+    frame.pack()
+    frame.focus_set()
+    
+def user_Input(event):
+    global count,current_word,current_char,you_win
+    if you_win==False:
+        # first word
+        if current_word==0:
+            if event.keysym==result[current_word][current_char] and current_char==0:
+                canvas.create_rectangle(150,30,350,80,outline="white",fill="white")
+                canvas.create_text(250,50,text="ba_k_p",fill="black",font=("Courier",25))
+                current_char+=1      
+            elif event.keysym==result[current_word][current_char] and current_char==1:
+                canvas.create_rectangle(150,30,350,80,outline="white",fill="white")
+                canvas.create_text(250,50,text="back_p",fill="black",font=("Courier",25))
+                current_char+=1 
+            elif event.keysym==result[current_word][current_char] and current_char==2:
+                canvas.create_rectangle(150,30,350,80,outline="white",fill="white")
+                canvas.create_text(250,50,text="backup",fill="black",font=("Courier",25))
+                canvas.create_text(250,500,text="YOU WIN!",fill="red",font=("Courier",40))
+                canvas.create_text(250,550,text="Enter any character for the next word",fill="red",font=("Courier",15))
+                you_win=True
+                current_word +=1
+            else:
+                count+=1
+                if count==7:
+                    canvas.create_text(250,500,text="YOU LOSE!",fill="purple",font=("Courier",40))
+                drawing(count)
+        # second word
+        elif current_word==1:
+            if event.keysym==result[current_word][current_char] and current_char==0:
+                canvas.create_rectangle(150,30,350,80,outline="white",fill="white")
+                canvas.create_text(250,50,text="alg_ri_hm",fill="black",font=("Courier",25))
+                current_char+=1        
+            elif event.keysym==result[current_word][current_char] and current_char==1:
+                canvas.create_rectangle(150,30,350,80,outline="white",fill="white")
+                canvas.create_text(250,50,text="algori_hm",fill="black",font=("Courier",25))
+                current_char+=1        
+            elif event.keysym==result[current_word][current_char] and current_char==2:
+                canvas.create_rectangle(150,30,350,80,outline="white",fill="white")
+                canvas.create_text(250,50,text="algorithm",fill="black",font=("Courier",25))
+                canvas.create_text(250,500,text="YOU WIN!",fill="red",font=("Courier",40))
+                canvas.create_text(250,550,text="Enter any character for the next word",fill="red",font=("Courier",15))
+                you_win=True
+                current_word +=1   
+            else:
+                count+=1
+                if count==7:
+                    canvas.create_text(250,500,text="YOU LOSE!",fill="purple",font=("Courier",40))
+                drawing(count)
+        # third word
+        elif current_word==2:
+            if event.keysym==result[current_word][current_char] and current_char==0:
+                canvas.create_rectangle(150,30,350,80,outline="white",fill="white")
+                canvas.create_text(250,50,text="kilob_t_",fill="black",font=("Courier",25))
+                current_char+=1    
+            elif event.keysym==result[current_word][current_char] and current_char==1:
+                canvas.create_rectangle(150,30,350,80,outline="white",fill="white")
+                canvas.create_text(250,50,text="kilobyt_",fill="black",font=("Courier",25))
+                current_char+=1        
+            elif event.keysym==result[current_word][current_char] and current_char==2:
+                canvas.create_rectangle(150,30,350,80,outline="white",fill="white")
+                canvas.create_text(250,50,text="kilobyte",fill="black",font=("Courier",25))
+                canvas.create_text(250,500,text="Congratulations!",fill="red",font=("Courier",32))
+                canvas.create_text(250,550,text="The End",fill="black",font=("Courier",15))
+                canvas.focus_set()
+            else:
+                count+=1
+                if count==7:
+                    canvas.create_text(250,500,text="YOU LOSE!",fill="purple",font=("Courier",40))
+                drawing(count)
+    else:
+        show_word()
+
+# "start" button    
+btn=Button(tk,textvariable=v,command=btn_click)
+btn.pack()
