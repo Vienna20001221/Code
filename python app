@@ -1,0 +1,296 @@
+import os, sys
+from tkinter import *
+from tkinter.font import Font
+from tkinter.ttk  import *
+from threading import Timer
+import json
+ 
+class Application_ui(Frame):  # application user interface
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
+        self.master.geometry('400x600')
+        self.user_info_file="userinfo.json"
+        self.user_list = {}        
+        self.createWidgets()
+ 
+    def createWidgets(self):
+         self.top = self.winfo_toplevel()
+         self.style = Style()
+         # TabStrip 1(outside)
+         self.TabStrip1 = Notebook(self.top)
+         self.TabStrip1.place(relx=0.032, rely=0.031, relwidth=0.92, relheight=0.95)
+         # TAB 1
+         self.TabStrip1__Tab0 = Frame(self.TabStrip1)
+         self.TabStrip1.add(self.TabStrip1__Tab0, text=' User Info ')
+         # Widgets 1-1
+         self.lbF0 = LabelFrame(self.TabStrip1__Tab0, width=350, height=250, text='User Information')
+         self.lbF0.grid(row=0, column=0, padx=5,pady=10)
+         # Declare variables
+         self.text_name = StringVar()
+         self.text_age = StringVar()
+         self.text_gender = StringVar()
+         self.text_height = StringVar()
+         self.text_weight = StringVar()
+         self.text_idealweight = StringVar()
+         self.current_name = StringVar()
+         self.text_mybmi = StringVar()
+         self.text_mybmirange = StringVar()
+         self.text_mycalorie = StringVar()
+         self.text_food = StringVar()
+         self.text_calorie = StringVar()
+         self.text_calorieleft = StringVar()
+         
+         def load_msg(*args): # load the user's information that already inputted before
+            get_info(self.users.get())
+            
+         def get_info(key): # get the other informations when the user selects a user name from the list
+            user = self.user_list[key]
+            self.text_name.set(user['name'])
+            self.text_age.set(user['age'])
+            self.text_gender.set(user['gender'])
+            self.text_height.set(user['height'])
+            self.text_weight.set(user['weight'])
+            self.text_idealweight.set(user['ideal weight'])
+            
+         # informations that the user needs to input and the input boxs
+         l_title = Label(self.lbF0,text="Please enter your information...")
+         l_title.place(relx=0.5,y=10,anchor=CENTER)         
+         self.l_user = Label(self.lbF0,text='Name：')
+         self.l_user.place(x=2,y=30)
+         self.e_user = Entry(self.lbF0,textvariable=self.text_name)
+         self.e_user.place(x=90,y=30)
+         self.l_age = Label(self.lbF0,text='Age：')
+         self.l_age.place(x=2,y=55)
+         self.e_age = Entry(self.lbF0, textvariable=self.text_age)
+         self.e_age.place(x=90,y=55)
+         self.l_gender = Label(self.lbF0,text='Gender：')
+         self.l_gender.place(x=2,y=80)
+         self.e_gender = Entry(self.lbF0, textvariable=self.text_gender)
+         self.e_gender.place(x=90,y=80)
+         self.l_height= Label(self.lbF0,text='Height(m)：')
+         self.l_height.place(x=2,y=105)
+         self.e_height = Entry(self.lbF0, textvariable=self.text_height)
+         self.e_height.place(x=90,y=105)
+         self.l_weight = Label(self.lbF0,text='Weight(kg)：')
+         self.l_weight.place(x=2,y=130)
+         self.e_weight = Entry(self.lbF0, textvariable=self.text_weight)
+         self.e_weight.place(x=90,y=130)
+         self.l_idealweight = Label(self.lbF0,text='Ideal Weight：')
+         self.l_idealweight.place(x=2,y=155)
+         self.e_idealweight = Entry(self.lbF0, textvariable=self.text_idealweight)
+         self.e_idealweight.place(x=90,y=155)
+         self.l_list = Label(self.lbF0,text='User List：')
+         self.l_list.place(x=2,y=180)
+         self.users = Combobox(self.lbF0, textvariable=self.current_name)  
+         self.users["state"] = "readonly"
+         self.users.bind("<<ComboboxSelected>>", load_msg)
+         self.users.place(x=90,y=180)
+         
+         # get the information from the json file to user list (as a tuple)
+         try:
+            with open(self.user_info_file) as f_obj:
+                self.user_list = json.load(f_obj)
+         except FileNotFoundError:
+                self.users.set("None")
+         else:
+            self.users["values"] = tuple(self.user_list.keys())
+            if len(self.users["values"])>0:
+                self.users.current(0)
+                get_info(self.users["values"][0])
+            else:
+                users.set("None")   
+
+         # BMI
+         self.lbF1 = LabelFrame(self.TabStrip1__Tab0, width=350, height=100, text='Your BMI')
+         self.lbF1.grid(row=1, column=0, pady=5)
+         bmi_ft = Font(family='Times New Roman', size=16)
+         self.myBMI=Label(self.lbF1, textvariable=self.text_mybmi, font=bmi_ft)
+         self.myBMI.place(relx=0.5, rely=0.3, anchor=CENTER)
+         self.myBMIrange=Label(self.lbF1, textvariable=self.text_mybmirange, font=bmi_ft)
+         self.myBMIrange.place(relx=0.5,rely=0.6, anchor=CENTER)
+
+         # Recommended Calorie
+         self.lbF2 = LabelFrame(self.TabStrip1__Tab0, width=350, height=100, text='Your Recommended Calorie Per Day')
+         self.lbF2.grid(row=2, column=0,pady=5)
+         calorie_ft = Font(family='Times New Roman', size=22)
+         self.myCALORIE=Label(self.lbF2, textvariable=self.text_mycalorie, font=calorie_ft)
+         self.myCALORIE.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+         def get_calorie(temp_gender,temp_weight,temp_height,temp_age):
+                if temp_gender=="female":
+                    temp_femalecalorie = round((10*float(temp_weight))+(6.25*100*float(temp_height))-(5*float(temp_age))-161,2)
+                    return temp_femalecalorie
+                else:
+                    temp_malecalorie = round((10*float(temp_weight))+(6.25*100*float(temp_height))-(5*float(temp_age))+5,2)
+                    return temp_malecalorie
+                
+         def btn_save():
+            # save the user informations in the json file
+            user_info = {} # dictionary
+            User = self.e_user.get()
+            Age = self.e_age.get()
+            Gender = self.e_gender.get()
+            Height = self.e_height.get()
+            Weight = self.e_weight.get()
+            Idealweight = self.e_idealweight.get()
+            
+            # save the user input as a dictionary in user_info
+            user_info['name'] = User
+            user_info['age'] = Age
+            user_info['gender'] = Gender
+            user_info['height'] = Height
+            user_info['weight'] = Weight
+            user_info['ideal weight'] = Idealweight
+            self.user_list[User] = user_info  # dictionary
+
+            # open the json file and write the information in f_obj
+            with open(self.user_info_file,'w') as f_obj:
+                json.dump(self.user_list,f_obj)     
+            self.users["values"] =tuple(self.user_list.keys())
+            self.users.current(0)
+            
+            # output the BMI and recommeded calorie calculation
+            temp_weight = self.text_weight.get()
+            temp_height = self.text_height.get()
+            temp_age = self.text_age.get()
+            temp_gender = self.text_gender.get().lower()
+            temp_bmi = round(float(temp_weight)/float(temp_height)/float(temp_height),2)           
+            
+            self.text_mybmi.set(temp_bmi)
+            underweight = 18.5
+            normalweight = 25
+            overweight = 30
+            if temp_bmi < underweight:
+                self.text_mybmirange.set("Your weight status is Underweight")
+            elif temp_bmi >= underweight and temp_bmi < normalweight:
+                self.text_mybmirange.set("Your weight status is Normal weight")
+            elif temp_bmi >= normalweight and temp_bmi < overweight:
+                self.text_mybmirange.set("Your weight status is Overweight")
+            elif temp_bmi > overweight:
+                self.text_mymbirange.set("Your weight status is Obese")
+
+            self.my_calorie = get_calorie(temp_gender,temp_weight,temp_height,temp_age)
+            self.text_mycalorie.set(self.my_calorie)
+
+            len_user = len(User)
+            len_age = len(Age)
+            len_gender = len(Gender)
+            len_height = len(Height)
+            len_weight = len(Weight)
+            len_idealweight = len(Idealweight)
+
+            # Delete the informations
+            self.e_user.delete(0,len_user)
+            self.e_age.delete(0,len_age)
+            self.e_gender.delete(0,len_gender)
+            self.e_height.delete(0,len_height)
+            self.e_weight.delete(0,len_weight)
+            self.e_idealweight.delete(0,len_idealweight)
+
+            self.text_calorieleft.set(self.my_calorie)
+            
+         # SAVE button         
+         self.fr = Frame(self.TabStrip1__Tab0,height=40, width=350)
+         self.fr.grid(row=3, column=0, padx=5)
+         self.action1 = Button(self.fr, text="Save", command=btn_save)  
+         self.action1.place(x=150, y=10)
+            
+         # TAB 2
+         self.TabStrip1__Tab2 = Frame(self.TabStrip1)
+         self.TabStrip1.add(self.TabStrip1__Tab2, text=' Food - Calorie ')
+
+        # Widget 2-1
+         self.lbF5 = LabelFrame(self.TabStrip1__Tab2, width=350, height=150, text='What did you eat today?')
+         self.lbF5.grid(row=0, column=0, padx=5)
+         self.l_food = Label(self.lbF5,text='Food：')
+         self.l_food.place(x=2,y=30)
+         self.e_food = Entry(self.lbF5, textvariable=self.text_food)
+         self.e_food.place(x=90,y=30)
+         self.l_calorie = Label(self.lbF5,text='Calorie：')
+         self.l_calorie.place(x=2,y=50)
+         self.e_calorie = Entry(self.lbF5, textvariable=self.text_calorie)
+         self.e_calorie.place(x=90,y=50)
+
+         def btn_save1():
+             temp_food = self.text_food.get()
+             temp_calorie = self.text_calorie.get()
+             self.my_calorie -= float(temp_calorie)
+             self.text_calorieleft.set(self.my_calorie)
+             Food = self.e_food.get()
+             Calorie = self.e_calorie.get()
+             len_food = len(Food)
+             len_calorie = len(Calorie)
+             self.e_food.delete(0,len_food)
+             self.e_calorie.delete(0,len_calorie)
+
+
+         # CALCULATE button
+         self.action1 = Button(self.lbF5, text="Calculate", command=btn_save1)  
+         self.action1.place(x=130, y=80)
+         
+         # Widgets 2-2
+         self.lbF3 = LabelFrame(self.TabStrip1__Tab2, width=350, height=280, text='Food List')
+         self.lbF3.grid(row=1, column=0, padx=5, pady=10)
+             
+         self.tree = Treeview(self.lbF3, selectmode='browse')
+         self.vsb = Scrollbar(self.lbF3, orient="vertical", command=self.tree.yview)
+         self.tree.configure(yscrollcommand=self.vsb.set)
+         self.vsb.place(x=331, y=0, height=260 + 20)
+         self.tree["columns"] = ("1", "2")
+         self.tree['show'] = 'headings'
+         self.tree.column("1", width=200, anchor='c')
+         self.tree.column("2", width=130, anchor='c')
+         self.tree.heading("1", text="Name")
+         self.tree.heading("2", text="Calorie")
+         selftreeList=[
+                'Bread, white or wheat (one slice)','Banana',
+                'Butter, salted (1TBSP)','Carrots, raw (1 cup)','Cola (12 oz)',
+                'Bagel','Cornflakes (100g)','Kraft Dinner (56g)','Rice, white boiled (100g)',
+                'All-Bran Cereal (1oz)','Egg, boiled','Egg, fried','After Eight Mint Chocolate(1 piece)',
+                'Blackberries (1 cup)','Blueberries, frozen (1 cup)','Bologna (1 slice)',
+                'Ritz Crackers, chedder cheese (20g)'
+                ]
+         selftreeList.sort()
+         calorieList=['29','90','140','105','75','185','90','225','102','52','136','357','155','90','210','140','64']
+
+         for i in range(len(selftreeList)):
+             self.tree.insert("", 'end', text="L1", values=(selftreeList[i],calorieList[i]))
+         self.tree.place(x=0, y=0, width=330, height=270)
+
+         # Widgets 2-3
+         self.lbF4 = LabelFrame(self.TabStrip1__Tab2, width=350, height=80, text='Calorie Left')
+         self.lbF4.grid(row=2, column=0,pady=5)
+         
+         ft = Font(family='Times New Roman', size=20)  
+         self.mycalorieleft=Label(self.lbF4, textvariable=self.text_calorieleft, font=ft)
+         self.mycalorieleft.place(relx=0.5, rely=0.5, anchor=CENTER)
+         
+         
+class Application(Application_ui):
+    def __init__(self, master=None):
+        super().__init__(master)
+        
+def Logo():
+    canvas.pack_forget()
+    Application(tk)
+
+    
+tk = Tk()
+tk.title("Potential")
+canvas = Canvas(tk, width=400, height=600)
+canvas.pack()
+current_path = os.getcwd()
+# picture 1
+image_path_1 = os.path.join(current_path,"P://")
+image_file_1 = os.path.join(image_path_1,"logo.gif")
+my_image_1 = PhotoImage(file=image_file_1)
+# picture 2
+image_path_2 = os.path.join(current_path,"P://")
+image_file_2 = os.path.join(image_path_2,"app name.gif")
+my_image_2 = PhotoImage(file=image_file_2)
+# output the image
+canvas.create_image(140,100, anchor=NW, image=my_image_1)
+canvas.create_image(25,170, anchor=NW, image=my_image_2)
+t = Timer(2.0, Logo)
+t.start()
+tk.mainloop() 
